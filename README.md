@@ -129,3 +129,5 @@ Never commit real API keys or webhook URLs.
 
 ## 📄 License
 
+This project is for portfolio and educational purposes.
+
