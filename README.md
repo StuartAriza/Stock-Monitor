@@ -1,104 +1,131 @@
-# Stock Monitor — Real-Time Stock Monitoring & Discord Alert System
+# 📈 Stock Monitor — Real-Time Alerting Platform
 
-A full-stack system that monitors stock tickers, evaluates custom alert rules, and sends notifications to Discord when conditions are met.
+A full-stack, dockerized stock monitoring system that tracks tickers, evaluates alert rules, and streams real-time updates via WebSockets and Discord notifications.
 
-## Architecture
+Built to simulate a production-style alerting backend with polling, rule evaluation, persistence, and event broadcasting.
+
+---
+
+## 🎬 Live System Demonstration
+
+<p align="center">
+  <img src="assets/stock-monitor-demo.gif" alt="Stock Monitor Demo" width="900"/>
+</p>
+
+---
+
+## 🚀 Features
+
+- REST API for managing tickers and alert rules
+- Real-time price polling engine
+- Rule evaluation with cooldown protection
+- WebSocket server for live dashboard updates
+- Discord webhook alert integration
+- PostgreSQL + Prisma ORM with migrations
+- Fully Dockerized (frontend, backend, database)
+- Environment-based configuration
+
+---
+
+## 🏗 Architecture
 
 ```
-stock-monitor/
-├── backend/          Node.js + Express + Prisma + WebSocket
-├── frontend/         React + TypeScript + Vite
-├── docker/           Docker configs
-├── docker-compose.yml
-└── .env.example
+React (Vite) → Nginx
+        ↓
+Express API + WebSocket Server
+        ↓
+Prisma ORM
+        ↓
+PostgreSQL
 ```
 
-## Tech Stack
+### Background Polling Service
 
-| Layer       | Technology                        |
-|-------------|-----------------------------------|
-| Backend     | Node.js, Express, Prisma ORM     |
-| Frontend    | React, TypeScript, Vite           |
-| Database    | PostgreSQL                        |
-| Real-time   | WebSocket (ws)                    |
-| Alerts      | Discord Webhooks                  |
-| Stock Data  | Alpha Vantage (with mock fallback)|
+- Fetches latest price data
+- Stores price history
+- Evaluates alert rules
+- Triggers notifications
+- Broadcasts updates via WebSocket
 
-## Quick Start
+---
 
-### Prerequisites
-- Node.js 20+
-- PostgreSQL 15+
-- Discord webhook URL (optional)
+## 🛠 Tech Stack
 
-### 1. Environment
+### Backend
+- Node.js
+- Express
+- Prisma ORM
+- PostgreSQL
+- WebSockets
+- Zod (validation)
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Nginx (containerized build)
+
+### Infrastructure
+- Docker
+- Docker Compose
+
+---
+
+## ⚙️ Local Development
+
+### 1️⃣ Clone the repository
+
+```bash
+git clone https://github.com/StuartAriza/Stock-Monitor.git
+cd Stock-Monitor
+```
+
+### 2️⃣ Configure environment variables
 
 ```bash
 cp .env.example .env
-# Edit .env with your values
 ```
-`
-### 2. Database
+
+Edit values if needed.
+
+### 3️⃣ Start the application
 
 ```bash
-cd backend
-npm install
-npx prisma migrate dev --name init
-npx prisma generate
+docker compose up --build
 ```
 
-### 3. Backend
+---
 
-```bash
-cd backend
-npm run dev
-# API: http://localhost:3001
-# WS:  ws://localhost:3001
-```
+## 🌐 Access the App
 
-### 4. Frontend
+Frontend:  
+http://localhost:5173
 
-```bash
-cd frontend
-npm install
-npm run dev
-# UI: http://localhost:5173
-```
+Backend API:  
+http://localhost:3001
 
-### Docker
+---
 
-```bash
-docker-compose up --build
-```
+## 🔐 Environment Configuration
 
-## API Endpoints
+All sensitive values are managed via environment variables.
 
-| Method | Path                    | Description              |
-|--------|-------------------------|--------------------------|
-| GET    | /api/tickers            | List tracked tickers     |
-| POST   | /api/tickers            | Add ticker               |
-| DELETE | /api/tickers/:symbol    | Remove ticker            |
-| GET    | /api/alerts/rules       | List alert rules         |
-| POST   | /api/alerts/rules       | Create alert rule        |
-| PATCH  | /api/alerts/rules/:id   | Toggle rule on/off       |
-| DELETE | /api/alerts/rules/:id   | Delete rule              |
-| GET    | /api/alerts/history     | Alert event log          |
-| GET    | /api/prices/:symbol     | Price history            |
+See `.env.example` for required configuration fields.
 
-## Alert Rule Types
+Never commit real API keys or webhook URLs.
 
-- `ABOVE_PRICE` — triggers when price exceeds threshold
-- `BELOW_PRICE` — triggers when price drops below threshold
-- `PCT_CHANGE` — triggers on % change from previous close
-- `VOLUME_SPIKE` — triggers when volume exceeds multiplier × average
+---
 
-## WebSocket Events
+## 📌 Future Improvements
 
-```json
-{ "type": "price_update", "data": { "symbol": "AAPL", "price": 182.50 } }
-{ "type": "alert_triggered", "data": { "rule": "...", "symbol": "..." } }
-```
+- [ ] Multi-user authentication  
+- [ ] Real market API integration  
+- [ ] Historical chart visualization  
+- [ ] Rate limiting & caching  
+- [ ] Cloud deployment  
+- [ ] Monitoring & logging enhancements  
 
-## License
+---
 
-MIT
+## 📄 License
+
