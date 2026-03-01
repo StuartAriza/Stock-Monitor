@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ticker {
+  id        String       @id @default(cuid())
+  symbol    String       @unique
+  name      String?
+  active    Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  prices    PriceRecord[]
+  rules     AlertRule[]
+  alerts    AlertEvent[]
+}
+
+model PriceRecord {
+  id        String   @id @default(cuid())
+  tickerId  String
+  ticker    Ticker   @relation(fields: [tickerId], references: [id], onDelete: Cascade)
+  price     Float
+  open      Float?
+  high      Float?
+  low       Float?
+  volume    BigInt?
+  timestamp DateTime @default(now())
+
+  @@index([tickerId, timestamp(sort: Desc)])
+}
+
+enum RuleType {
+  ABOVE_PRICE
+  BELOW_PRICE
+  PCT_CHANGE
+  VOLUME_SPIKE
+}
+
+model AlertRule {
+  id         String       @id @default(cuid())
+  tickerId   String
+  ticker     Ticker       @relation(fields: [tickerId], references: [id], onDelete: Cascade)
+  type       RuleType
+  threshold  Float
+  enabled    Boolean      @default(true)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  events     AlertEvent[]
+
+  @@index([tickerId, enabled])
+}
+
+model AlertEvent {
+  id            String    @id @default(cuid())
+  tickerId      String
+  ticker        Ticker    @relation(fields: [tickerId], references: [id], onDelete: Cascade)
+  ruleId        String
+  rule          AlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  message       String
+  priceAtAlert  Float
+  discordSent   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  @@index([tickerId, createdAt(sort: Desc)])
+  @@index([ruleId, createdAt(sort: Desc)])
+}
